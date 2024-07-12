@@ -1,12 +1,29 @@
 import { Plus } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CreateActivityModal } from "./create-activity-modal";
 import { ImportantLinks } from "./important-links";
 import { Guests } from "./guests";
 import { Activities } from "./activities";
 import { DestinationAndDateHeader } from "./destination-and-date-header";
+import { useParams } from "react-router-dom";
+import { api } from "../../lib/axios";
+
+interface Trip {
+    id: string,
+    destination: string,
+    starts_at: string,
+    ends_at: string,
+    is_confirmed: boolean
+}
 
 export function TripDetailsPage() {
+    const { tripId } = useParams();
+    const [trip, setTrip] = useState<Trip | undefined>()
+
+    useEffect(() => {
+        api.get(`/trips/${tripId}`).then((response) => setTrip(response.data.trip))
+    }, [tripId])
+
     const [isCreateActivityModalOpen, setIsCreateActivityModalOpen] = useState(false)
 
     function openCreateActivityModal() {
@@ -19,7 +36,7 @@ export function TripDetailsPage() {
 
     return (
         <div className="max-w-6xl px-6 py-10 mx-auto space-y-8">
-            <DestinationAndDateHeader />
+            <DestinationAndDateHeader destination={trip?.destination} startsAt={trip?.starts_at} endsAt={trip?.ends_at} />
 
             <main className="flex gap-16 px-4">
                 <div className="flex-1 space-y-6">
